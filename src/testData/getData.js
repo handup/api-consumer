@@ -16,7 +16,7 @@ export const getStopTime = (timeUpdate) =>{
     return timeUpdate.arrival.time
 }
 
-const FilterTrips =async (agencyID, stopId) => {
+const FilterTrips = async (agencyID, stopId) => {
   const response = RTrequest(agencyID)
   return response.then(y=> y.filter(x => !!FindStopTrip(x, stopId)))
 }
@@ -24,7 +24,6 @@ const FilterTrips =async (agencyID, stopId) => {
 export const getTripsFromStop = async (agencyID, stopId) => {
     const response = FilterTrips(agencyID, stopId)
     return response.then( y=> {
-      console.log(y)
       return y.sort((a, b) => getStopTime(FindStopTrip(a, stopId)) - getStopTime(FindStopTrip(b, stopId)) )
   })
 }
@@ -34,8 +33,6 @@ const RTrequest = async (agencyID) => {
   const url = 'http://api.511.org/transit/tripupdates?api_key=028dd11b-45fe-411f-842c-a71399a9b656&agency=' + agencyID
   let response = await fetch(url);
   if (response.ok) {
-  // if HTTP-status is 200-299
-  // get the response body (the method explained below)
   const bufferRes = await response.arrayBuffer();
   const feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(new Uint8Array(bufferRes));
 
@@ -44,20 +41,6 @@ const RTrequest = async (agencyID) => {
   return {}
   }
 }
-
-/*const StopsRequest = (agencyID) => {
-  const requestSettings = {
-      method: 'GET',
-      url: 'http://api.511.org/transit/StopMonitoring?api_key=028dd11b-45fe-411f-842c-a71399a9b656&' + agencyID,
-      encoding: 'json'
-    }
-
-  return request(requestSettings, (error, response, body) => {
-      if (!error && response.statusCode == 200) {
-        return response.toJSON();
-      }
-    });
-}*/
 
 const StopsRequest = async (agencyID) =>{
   const response = await fetch('http://api.511.org/transit/stops?api_key=028dd11b-45fe-411f-842c-a71399a9b656&operator_id=' + agencyID);
